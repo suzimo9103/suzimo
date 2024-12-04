@@ -1,0 +1,2511 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>子墨的灵感库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .title {
+            text-align: center;
+            margin: 20px 0 30px;
+            color: #333;
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid #eee;
+            color: #666;
+        }
+
+        .footer p {
+            margin: 8px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* 数据管理区域 */
+        .data-management {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .left-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .right-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .delete-all-button {
+            background: #d32f2f;
+            opacity: 0.7;
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+
+        .delete-all-button:hover {
+            background: #b71c1c;
+            opacity: 1;
+        }
+
+        .management-button {
+            padding: 8px 16px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .management-button:hover {
+            background: #1976D2;
+        }
+
+        /* 上传区域 */
+        .upload-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        .upload-area:hover {
+            border-color: #2196F3;
+            background-color: #f0f8ff;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        /* 标签区域 */
+        .tag-section {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tag-title {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .tags {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .tag {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            background: white;
+            transition: all 0.3s;
+            font-size: 14px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .tag:hover {
+            z-index: 999;
+        }
+
+        .tag.selected {
+            background-color: #2196F3;
+            color: white;
+            border-color: #1976D2;
+        }
+
+        .tag:hover {
+            background-color: #f0f8ff;
+            border-color: #2196F3;
+        }
+
+        /* 瀑布流区域 */
+        .waterfall-container {
+            column-count: 4;
+            column-gap: 20px;
+            padding: 20px 0;
+        }
+
+        .waterfall-item {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .waterfall-item:hover {
+            transform: scale(1.02);
+        }
+
+        .waterfall-item img {
+            width: 100%;
+            border-radius: 8px;
+            display: block;
+        }
+        /* 图片查看模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal.active .modal-overlay {
+            opacity: 1;
+        }
+
+        .modal-clickable-area {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 35%;
+            cursor: pointer;
+        }
+
+        .modal-clickable-area.left {
+            left: 0;
+        }
+
+        .modal-clickable-area.right {
+            right: 0;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 90%;
+            margin: 30px auto;
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            z-index: 1;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-center-area {
+            position: absolute;
+            top: 0;
+            left: 35%;
+            width: 30%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal img {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .image-info {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            text-align: left;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+
+        .image-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .action-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .delete-button {
+            background: #f44336;
+        }
+
+        .delete-button:hover {
+            background: #d32f2f;
+        }
+
+        /* 标签编辑模态框 */
+        .edit-modal {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .edit-content {
+            background: white;
+            padding: 20px;
+            max-width: 800px;
+            margin: 30px auto;
+            border-radius: 8px;
+            cursor: default;
+        }
+
+        .tag-category {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .tag-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-option {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            background: white;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .tag-option.selected {
+            background-color: #2196F3;
+            color: white;
+            border-color: #1976D2;
+        }
+
+        .tag-option:hover {
+            background-color: #f0f8ff;
+            border-color: #2196F3;
+        }
+
+        .image-notes {
+            width: 100%;
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .save-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .save-button:hover {
+            background: #45a049;
+        }
+
+        .preview-tag {
+            font-size: 12px;
+            padding: 2px 8px;
+            background: #e3f2fd;
+            color: #1976D2;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        /* 提示消息 */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            z-index: 2000;
+            transition: opacity 0.3s;
+        }
+
+        .toast.info {
+            background: rgba(33, 150, 243, 0.9);
+        }
+
+        .toast.error {
+            background: rgba(244, 67, 54, 0.9);
+        }
+
+        .toast.success {
+            background: rgba(76, 175, 80, 0.9);
+        }
+
+        @media (max-width: 1200px) {
+            .waterfall-container {
+                column-count: 3;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .waterfall-container {
+                column-count: 2;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .waterfall-container {
+                column-count: 1;
+            }
+        }
+
+        .ai-features {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .ai-section {
+            text-align: center;
+        }
+
+        .ai-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .ai-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            background: #2196F3;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ai-button:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .ai-icon {
+            font-size: 20px;
+        }
+
+        /* AI 分析模态框样式 */
+        .ai-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .ai-modal-content {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .ai-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 6px;
+        }
+
+        .ai-loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .ai-loading:after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        /* 让标签容器变成弹性滚动 */
+        .tags {
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* 美化滚动条 */
+        .tags::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .tags::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .tags::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .tags::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .analysis-sections {
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .analysis-sections.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .analysis-sections h4 {
+            color: #333;
+            margin: 15px 0 10px;
+            font-size: 16px;
+        }
+
+        .analysis-text {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .error {
+            color: #f44336;
+            text-align: center;
+            padding: 20px;
+            background: #ffebee;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        /* 更新分析容器的样式 */
+        .analysis-container {
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative; /* 添加相对定位 */
+            z-index: 1; /* 确保容器在正确的层级 */
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .analysis-flex {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            position: relative; /* 添加相对定位 */
+            z-index: 2; /* 确保flex容器在上层 */
+        }
+
+        .image-section {
+            flex: 0 0 45%;
+            padding: 15px;
+            border-radius: 8px;
+            position: relative; /* 添加相对定位 */
+            z-index: 1;
+        }
+
+        .analysis-sections {
+            flex: 0 0 55%;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative; /* 添加相对定位 */
+            z-index: 3; /* 确保文字内容在最上层 */
+        }
+
+        .analysis-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            position: relative; /* 添加相对定位 */
+            z-index: 4; /* 确保每个分析项在最上层 */
+        }
+
+        .analysis-item h4 {
+            color: #1976D2;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e3f2fd;
+        }
+
+        /* 确保文字可见 */
+        .analysis-text {
+            color: #000000;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 5px;
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .analysis-item:nth-child(1) { animation-delay: 0.1s; }
+        .analysis-item:nth-child(2) { animation-delay: 0.2s; }
+        .analysis-item:nth-child(3) { animation-delay: 0.3s; }
+        .analysis-item:nth-child(4) { animation-delay: 0.4s; }
+        .analysis-item:nth-child(5) { animation-delay: 0.5s; }
+        .analysis-item:nth-child(6) { animation-delay: 0.6s; }
+
+        /* 修改AI模态框样式 */
+        .ai-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .ai-modal-content {
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1001;
+        }
+
+        /* 确保图片不会覆盖文字 */
+        .analysis-img {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 1024px) {
+            .analysis-flex {
+                flex-direction: column;
+            }
+
+            .image-section,
+            .analysis-sections {
+                flex: none;
+                width: 100%;
+            }
+
+            .analysis-sections {
+                max-height: none;
+            }
+
+            .analysis-img {
+                max-height: 400px;
+                width: auto;
+                margin: 0 auto;
+                display: block;
+            }
+        }
+
+        /* 增加一些对比度 */
+        .analysis-container {
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+        /* 让文字更清晰 */
+        .analysis-text {
+            text-shadow: 0 0 1px rgba(0,0,0,0.1);
+            font-weight: 500;
+        }
+
+        /* 添加加载动画样式 */
+        .image-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 添加图片懒加载占位样式 */
+        .waterfall-item {
+            position: relative;
+            min-height: 100px;
+            background: #f5f5f5;
+        }
+
+        /* 添加标签提示样式 */
+        .tag-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .tag-help {
+            font-size: 14px;
+            color: #999;
+            cursor: help;
+            position: relative;
+        }
+
+        .tag-help:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            width: max-content;
+            max-width: 300px;
+            z-index: 1000;
+            margin-left: 8px;
+        }
+
+        /* 标签提示样式 */
+        .tag[data-tip] {
+            position: relative;
+        }
+
+        .tag[data-tip]:hover {
+            z-index: 9999;
+        }
+
+        .tag[data-tip]:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 12px;
+            border-radius: 4px;
+            pointer-events: none;
+            max-width: 250px;
+            white-space: normal;
+            word-wrap: break-word;
+            line-height: 1.4;
+            z-index: 10000;
+            left: 50%;
+            bottom: 100%;
+            margin-bottom: 10px;
+        }
+
+        .tag[data-tip]:hover::before {
+            content: '';
+            position: absolute;
+            border: 5px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            z-index: 10000;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 100%;
+            margin-bottom: 5px;
+        }
+
+        /* 确保标签容器可以正确显示提示框 */
+        .tag-section {
+            overflow: visible;
+            position: relative;
+            padding-top: 30px; /* 为提示框预留空间 */
+        }
+
+        .tags {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px; /* 为提示框预留空间 */
+        }
+
+        /* 重写提示框样式 */
+        .tooltip-container {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+            max-width: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            line-height: 1.4;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">子墨的灵感库</h1>
+
+        <!-- 数据管理区域 -->
+        <div class="data-management">
+            <div class="left-buttons">
+                <button class="management-button delete-all-button" onclick="confirmDeleteAll()">删除所有</button>
+            </div>
+            <div class="right-buttons">
+                <button class="management-button" onclick="exportData()">导出数据</button>
+                <input type="file" id="importInput" accept=".json" hidden>
+                <button class="management-button" onclick="document.getElementById('importInput').click()">导入数据</button>
+            </div>
+        </div>
+
+        <!-- 添加 AI 功能区域 -->
+        <div class="ai-features">
+            <div class="ai-section">
+                <h2>AI 助手</h2>
+                <div class="ai-buttons">
+                    <button class="ai-button" onclick="showAutoTagging()">
+                        <span class="ai-icon">🏷️</span>
+                        自动标签
+                    </button>
+                    <button class="ai-button" onclick="showDesignAnalysis()">
+                        <span class="ai-icon">🔍</span>
+                        设计分析
+                    </button>
+                    <button class="ai-button" onclick="showTrainingArea()">
+                        <span class="ai-icon">🎯</span>
+                        模型训练
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 上传区域 -->
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="imageInput" accept="image/*" multiple hidden>
+                <div class="upload-icon">📁</div>
+                <p>点击或拖拽图片到此处上传</p>
+                <p style="color: #666; font-size: 14px;">支持多张图片上传</p>
+            </div>
+        </div>
+
+        <!-- 标签区域将由 JavaScript 动态生成 -->
+        <div id="tagContainer"></div>
+
+        <!-- 瀑布流图片展示区域 -->
+        <div class="waterfall-container" id="imageWaterfall"></div>
+
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>创作者：子墨</p>
+            <p>微信号：zimo-1376</p>
+        </div>
+    </div>
+
+    <!-- 图片查看模态框 -->
+    <div class="modal" id="imageViewModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-clickable-area left"></div>
+        <div class="modal-center-area">
+            <div class="modal-content">
+                <img id="modalImage" src="" alt="">
+                <div class="image-info">
+                    <div id="modalTags"></div>
+                    <div id="modalNotes"></div>
+                    <div class="image-actions">
+                        <button class="action-button delete-button" onclick="deleteCurrentImage()">删除图片</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-clickable-area right"></div>
+    </div>
+
+    <!-- 标签编辑模态框 -->
+    <div class="modal edit-modal" id="tagEditModal">
+        <div class="edit-content">
+            <h3>编辑图片标签</h3>
+            <img id="editingImage" style="max-width: 100%; max-height: 300px; object-fit: contain; margin: 20px 0;">
+            <div class="tag-categories" id="editTagCategories">
+                <!-- 空间功能 -->
+                <div class="tag-category">
+                    <h4>空间功能</h4>
+                    <div class="tag-options" data-category="function">
+                        <button class="tag-option">大堂接待</button>
+                        <button class="tag-option">休息区</button>
+                        <!-- ... 其他空间功能标签 ... -->
+                    </div>
+                </div>
+                <!-- 空间氛围 -->
+                <div class="tag-category">
+                    <h4>空间氛围</h4>
+                    <div class="tag-options" data-category="atmosphere">
+                        <button class="tag-option">森系</button>
+                        <button class="tag-option">海系</button>
+                        <!-- ... 其他空间氛围标签 ... -->
+                    </div>
+                </div>
+                <!-- 设计元素 -->
+                <div class="tag-category">
+                    <h4>设计元素</h4>
+                    <div class="tag-options" data-category="elements">
+                        <button class="tag-option">落地窗</button>
+                        <button class="tag-option">天窗</button>
+                        <!-- ... 其他设计元素标签 ... -->
+                    </div>
+                </div>
+                <!-- 场景故事 -->
+                <div class="tag-category">
+                    <h4>场景故事</h4>
+                    <div class="tag-options" data-category="story">
+                        <button class="tag-option">早餐时光</button>
+                        <button class="tag-option">下午茶</button>
+                        <!-- ... 其他场景故事标签 ... -->
+                    </div>
+                </div>
+            </div>
+            <textarea class="image-notes" id="imageNotes" placeholder="添加备注..."></textarea>
+            <button class="save-button" onclick="saveImageTags()">保存标签</button>
+        </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div class="toast" id="toast"></div>
+    <script>
+        // 添加全局错误处理
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
+            showToast('发生错误，请刷新页面重试');
+            return false;
+        };
+
+        // 改进showToast函数
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`; // 添加不同类型的样式
+            toast.style.display = 'block';
+            
+            // 防止多个toast重叠
+            if (window.toastTimeout) {
+                clearTimeout(window.toastTimeout);
+            }
+            
+            window.toastTimeout = setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // 初始化数据
+        let db;
+        let currentViewingImage = null;
+        const DB_NAME = 'inspirationDB';
+        const STORE_NAME = 'images';
+        let currentEditingId = null;
+
+        const request = indexedDB.open(DB_NAME, 1);
+
+        request.onerror = (event) => {
+            console.error("数据库错误:", event.target.error);
+            showToast("数据库错误，请检浏览器设置");
+        };
+
+        request.onupgradeneeded = (event) => {
+            db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            }
+        };
+
+        request.onsuccess = (event) => {
+            db = event.target.result;
+            
+            // 上传区域事件处理
+            const uploadArea = document.getElementById('uploadArea');
+            const imageInput = document.getElementById('imageInput');
+
+            // 点击上传
+            uploadArea.onclick = () => {
+                imageInput.click();
+            };
+
+            // 文件选择处理
+            imageInput.onchange = (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    handleFiles(e.target.files);
+                    e.target.value = '';  // 清空input值，允许重复选择相同文件
+                }
+            };
+
+            // 拖拽上传
+            uploadArea.ondragover = (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#2196F3';
+            };
+
+            uploadArea.ondragleave = (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#ccc';
+            };
+
+            uploadArea.ondrop = (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#ccc';
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    handleFiles(e.dataTransfer.files);
+                }
+            };
+
+            // 加载已有图片
+            loadImages();
+        };
+
+        // 导入导出功能
+        document.getElementById('importInput').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                importData(e.target.files[0]);
+            }
+        });
+
+        function exportData() {
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                try {
+                    const data = request.result;
+                    if (data.length === 0) {
+                        showToast('没有数据可导出');
+                        return;
+                    }
+
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `inspiration-backup-${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showToast("数据导出成功");
+                } catch (error) {
+                    console.error('导出失败:', error);
+                    showToast('导出失败，请重试');
+                }
+            };
+
+            request.onerror = (error) => {
+                console.error('导出失败:', error);
+                showToast('导出失败，请重试');
+            };
+        }
+
+        function importData(file) {
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // 验证数据格式
+                    if (!Array.isArray(data)) {
+                        throw new Error('无效的数据格式');
+                    }
+
+                    // 验证每个数据项
+                    data.forEach(item => {
+                        if (!item.id || !item.url || !item.tags) {
+                            throw new Error('数据格式不完整');
+                        }
+                    });
+
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    
+                    // 使用Promise等待所有数据导入完成
+                    await Promise.all(data.map(item => {
+                        return new Promise((resolve, reject) => {
+                            const request = store.put(item);
+                            request.onsuccess = () => resolve();
+                            request.onerror = () => reject();
+                        });
+                    }));
+                    
+                    loadImages();
+                    showToast(`成功导入 ${data.length} 条数据`);
+                } catch (error) {
+                    console.error('导入失败:', error);
+                    showToast('导入失败：' + (error.message || '请检查文件格式'));
+                }
+            };
+
+            reader.onerror = () => {
+                showToast('文件读取失败，请重试');
+            };
+
+            reader.readAsText(file);
+        }
+
+        function handleFiles(files) {
+            if (!files || files.length === 0) return;
+            
+            // 修改为支持多文件上传
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) {
+                    showToast('请选择图片文件');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageData = {
+                        id: Date.now() + Math.random(), // 确保ID唯一
+                        url: e.target.result,
+                        fileName: file.name,
+                        tags: {
+                            function: [],
+                            atmosphere: [],
+                            elements: [],
+                            story: []
+                        },
+                        notes: ''
+                    };
+                    showEditModal(imageData);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 图片查看相关
+        function showImageView(image) {
+            currentViewingImage = image;
+            const modal = document.getElementById('imageViewModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalTags = document.getElementById('modalTags');
+            const modalNotes = document.getElementById('modalNotes');
+
+            modalImage.src = image.url;
+            
+            modalTags.innerHTML = `
+                <h4>标签：</h4>
+                ${Object.entries(image.tags).map(([category, tags]) => `
+                    <div class="tag-group">
+                        <strong>${getCategoryName(category)}：</strong>
+                        ${tags.map(tag => `<span class="preview-tag">${tag}</span>`).join('')}
+                    </div>
+                `).join('')}
+            `;
+
+            modalNotes.innerHTML = `
+                <h4>备注：</h4>
+                <p>${image.notes || '暂无备注'}</p>
+            `;
+
+            modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeImageView() {
+            const modal = document.getElementById('imageViewModal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                currentViewingImage = null;
+            }, 300);
+        }
+
+        // 标签编辑相关
+        function showEditModal(imageData) {
+            currentEditingId = imageData.id;
+            const modal = document.getElementById('tagEditModal');
+            const editingImage = document.getElementById('editingImage');
+            
+            editingImage.src = imageData.url;
+            document.getElementById('imageNotes').value = imageData.notes || '';
+            
+            // 重置所有标签的选中状态
+            document.querySelectorAll('.tag-option').forEach(tag => {
+                tag.classList.remove('selected');
+            });
+            
+            // 更新编辑模态框的内容
+            const editContent = document.querySelector('.edit-content .tag-categories');
+            let html = '';
+            
+            Object.entries(tagCategories).forEach(([category, data]) => {
+                html += `
+                    <div class="tag-category">
+                        <h4>${data.title}</h4>
+                        <div class="tag-options" data-category="${category}">
+                            ${Object.values(data.tags).flat().map(tag => 
+                                `<button class="tag-option" onclick="toggleTagSelection(this)">${tag}</button>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            editContent.innerHTML = html;
+            
+            modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        // 添加标签选择切换函数
+        function toggleTagSelection(tagElement) {
+            tagElement.classList.toggle('selected');
+        }
+
+        function closeTagEditModal() {
+            const modal = document.getElementById('tagEditModal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                currentEditingId = null;
+            }, 300);
+        }
+
+        function saveImageTags() {
+            const selectedTags = {};
+            
+            Object.keys(tagCategories).forEach(category => {
+                selectedTags[category] = [];
+                document.querySelectorAll(`#editTagCategories .tag-options[data-category="${category}"] .tag-option.selected`).forEach(tag => {
+                    selectedTags[category].push(tag.textContent);
+                });
+            });
+            
+            const notes = document.getElementById('imageNotes').value;
+            
+            const imageData = {
+                id: currentEditingId,
+                url: document.getElementById('editingImage').src,
+                tags: selectedTags,
+                notes: notes
+            };
+            
+            saveImage(imageData);
+            closeTagEditModal();
+            showToast("标签保存成功");
+        }
+
+        // 数据库操作
+        function saveImage(imageData) {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            store.put(imageData);
+            transaction.oncomplete = () => {
+                loadImages();
+            };
+        }
+
+        function deleteCurrentImage() {
+            if (!currentViewingImage || !confirm('确定要删除这张图片吗？')) return;
+
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            store.delete(currentViewingImage.id);
+            
+            transaction.oncomplete = () => {
+                closeImageView();
+                loadImages();
+                showToast("图片已删除");
+            };
+        }
+
+        function loadImages() {
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const images = request.result;
+                renderImages(images);
+            };
+        }
+
+        function renderImages(images) {
+            const container = document.getElementById('imageWaterfall');
+            container.innerHTML = '';
+
+            // 使用文档片段优化性能
+            const fragment = document.createDocumentFragment();
+            
+            images.forEach(image => {
+                const div = document.createElement('div');
+                div.className = 'waterfall-item';
+                
+                // 添加加载动画
+                div.innerHTML = `
+                    <div class="image-loading">加载中...</div>
+                    <img src="${image.url}" alt="" loading="lazy">
+                `;
+                
+                const img = div.querySelector('img');
+                img.onload = () => {
+                    div.querySelector('.image-loading').style.display = 'none';
+                };
+                
+                div.onclick = () => showImageView(image);
+                fragment.appendChild(div);
+            });
+            
+            container.appendChild(fragment);
+        }
+
+        // 具函数
+        function getCategoryName(category) {
+            const names = {
+                material: '材质',
+                structure: '结构',
+                color: '色彩',
+                style: '设计风格'
+            };
+            return names[category] || category;
+        }
+
+        // 标签点击事件
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                const category = tag.parentElement.dataset.category;
+                const isAll = tag.textContent === '全部';
+                const tags = tag.parentElement.querySelectorAll('.tag');
+                
+                if (isAll) {
+                    tags.forEach(t => t.classList.remove('selected'));
+                    tag.classList.toggle('selected');
+                } else {
+                    tag.parentElement.querySelector('.tag:first-child').classList.remove('selected');
+                    tag.classList.toggle('selected');
+                }
+                
+                filterImages();
+            });
+        });
+
+        document.querySelectorAll('.tag-option').forEach(tag => {
+            tag.addEventListener('click', () => {
+                tag.classList.toggle('selected');
+            });
+        });
+
+        // 点左右区域关闭图片
+        document.querySelector('.modal-clickable-area.left').addEventListener('click', closeImageView);
+        document.querySelector('.modal-clickable-area.right').addEventListener('click', closeImageView);
+
+        // 图片筛选
+        function filterImages() {
+            const selectedTags = {};
+            
+            Object.keys(tagCategories).forEach(category => {
+                selectedTags[category] = [];
+                const tagContainer = document.querySelector(`.tags[data-category="${category}"]`);
+                const allTag = tagContainer.querySelector('.tag:first-child');
+                
+                if (!allTag.classList.contains('selected')) {
+                    tagContainer.querySelectorAll('.tag.selected').forEach(tag => {
+                        if (tag.textContent !== '全部') {
+                            selectedTags[category].push(tag.textContent);
+                        }
+                    });
+                }
+            });
+
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const images = request.result;
+                const filteredImages = images.filter(image => {
+                    return Object.entries(selectedTags).every(([category, tags]) => {
+                        if (tags.length === 0) return true;
+                        return tags.some(tag => 
+                            image.tags[category] && image.tags[category].includes(tag)
+                        );
+                    });
+                });
+                renderImages(filteredImages);
+            };
+        }
+
+        // 加载TensorFlow.js
+        async function loadAIModels() {
+            try {
+                const model = await mobilenet.load({
+                    version: 2,
+                    alpha: 1.0
+                });
+                showToast('AI模型加载成功');
+                return model;
+            } catch (error) {
+                console.error('AI模型加载失败:', error);
+                showToast('AI模型加载失败，请检查网络连接');
+                return null;
+            }
+        }
+
+        // 自动标签功能
+        function showAutoTagging() {
+            const modal = document.createElement('div');
+            modal.className = 'ai-modal';
+            modal.innerHTML = `
+                <div class="ai-modal-content">
+                    <h3>AI 自动标签</h3>
+                    <div class="upload-area" id="aiUploadArea">
+                        <input type="file" id="aiImageInput" accept="image/*" hidden>
+                        <div class="upload-icon">🤖</div>
+                        <p>上传图片进行自动标签分析</p>
+                    </div>
+                    <div class="ai-result" id="aiTagResult"></div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            // 处理上传逻辑
+            const aiUploadArea = document.getElementById('aiUploadArea');
+            const aiImageInput = document.getElementById('aiImageInput');
+            
+            aiUploadArea.onclick = () => aiImageInput.click();
+            aiImageInput.onchange = handleAIImageUpload;
+        }
+
+        // 设计分析功能
+        async function showDesignAnalysis() {
+            const modal = document.createElement('div');
+            modal.className = 'ai-modal';
+            modal.innerHTML = `
+                <div class="ai-modal-content">
+                    <h3>设计分析</h3>
+                    <div class="upload-area" id="designUploadArea">
+                        <input type="file" id="designImageInput" accept="image/*" hidden>
+                        <div class="upload-icon">📊</div>
+                        <p>上传效果图获取设计建议</p>
+                    </div>
+                    <div class="ai-result" id="designAnalysisResult"></div>
+                    <button class="action-button" onclick="closeAIModal()" style="margin-top: 20px;">关闭</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+
+            // 处理传逻辑
+            const designUploadArea = document.getElementById('designUploadArea');
+            const designImageInput = document.getElementById('designImageInput');
+            
+            designUploadArea.onclick = () => designImageInput.click();
+            designImageInput.onchange = handleDesignImageUpload;
+        }
+
+        // 修改处理设计图片上传函数
+        async function handleDesignImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const analysisResult = document.getElementById('designAnalysisResult');
+            analysisResult.innerHTML = '<div class="ai-loading">正在分析设计...</div>';
+
+            try {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const imageUrl = e.target.result;
+                    img.src = imageUrl;
+                    
+                    img.onload = async () => {
+                        try {
+                            // 使用MobileNet模型分析图片
+                            const model = await mobilenet.load();
+                            const predictions = await model.classify(img, 10);
+                            console.log('图片识别结果:', predictions);
+
+                            // 分析图片颜色
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx.drawImage(img, 0, 0);
+                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const colorAnalysis = analyzeImageColors(imageData.data);
+
+                            // 根据识别结果生成分析内容
+                            const analysis = {
+                                concept: generateConceptAnalysis(predictions),
+                                space: generateSpaceAnalysis(predictions),
+                                elements: generateElementsAnalysis(predictions),
+                                materials: generateMaterialsAnalysis(predictions, colorAnalysis),
+                                colors: generateColorAnalysis(colorAnalysis),
+                                cultural: generateCulturalAnalysis(predictions)
+                            };
+
+                            // 修改显示分析结果的HTML
+                            const resultHTML = `
+                                <div style="display: flex; gap: 30px; padding: 20px; background: white; border-radius: 8px;">
+                                    <div style="flex: 0 0 45%;">
+                                        <img src="${imageUrl}" alt="设计图" style="width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                    </div>
+                                    <div style="flex: 1; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                        <div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                            <h4 style="color: #000; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px;">🎨 设计理念</h4>
+                                            <div style="color: #000; line-height: 1.6;">${analysis.concept}</div>
+                                        </div>
+                                        <div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                            <h4 style="color: #000; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px;">📐 空间布局</h4>
+                                            <div style="color: #000; line-height: 1.6;">${analysis.space}</div>
+                                        </div>
+                                        <div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                            <h4 style="color: #000; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px;">✨ 设计元素</h4>
+                                            <div style="color: #000; line-height: 1.6;">${analysis.elements}</div>
+                                        </div>
+                                        <div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                            <h4 style="color: #000; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px;">🎭 材质搭配</h4>
+                                            <div style="color: #000; line-height: 1.6;">${analysis.materials}</div>
+                                        </div>
+                                        <div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                            <h4 style="color: #000; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px;">🌈 色彩方案</h4>
+                                            <div style="color: #000; line-height: 1.6;">${analysis.colors}</div>
+                                        </div>
+                                        <div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                            <h4 style="color: #000; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px;">🏛️ 文化内涵</h4>
+                                            <div style="color: #000; line-height: 1.6;">${analysis.cultural}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+
+                            analysisResult.innerHTML = resultHTML;
+                        } catch (error) {
+                            console.error('分析过程出错:', error);
+                            analysisResult.innerHTML = '<div class="error">分析失败，请重试</div>';
+                        }
+                    };
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('文件处理失败:', error);
+                analysisResult.innerHTML = '<div class="error">文件处理失败，请重试</div>';
+            }
+        }
+
+        // 分析片颜色
+        function analyzeImageColors(imageData) {
+            let colors = {
+                warm: 0,
+                cool: 0,
+                neutral: 0,
+                bright: 0,
+                dark: 0
+            };
+
+            for (let i = 0; i < imageData.length; i += 4) {
+                const r = imageData[i];
+                const g = imageData[i + 1];
+                const b = imageData[i + 2];
+
+                // 分析色温
+                if (r > g && r > b) colors.warm++;
+                else if (b > r && b > g) colors.cool++;
+                else colors.neutral++;
+
+                // 分析明度
+                const brightness = (r + g + b) / 3;
+                if (brightness > 128) colors.bright++;
+                else colors.dark++;
+            }
+
+            return colors;
+        }
+
+        // 生成设计理念分析
+        function generateConceptAnalysis(predictions) {
+            const mainElements = predictions.slice(0, 3).map(p => p.className);
+            const style = predictions.find(p => 
+                p.className.toLowerCase().includes('modern') || 
+                p.className.toLowerCase().includes('traditional')
+            );
+
+            return `这是一个以${style ? style.className : '现代'}风格为主的空间设计。空间中突出的${
+                mainElements.join('、')}等元素现了设计师对空间功能与美感的深入思考。设计理念注重空间的实用性与美感的平衡，
+                通过精心选择的元素组合，打造出既舒适又富有品位的生活环境。`;
+        }
+
+        // 生成空间布局分析
+        function generateSpaceAnalysis(predictions) {
+            const hasOpenSpace = predictions.some(p => 
+                p.className.toLowerCase().includes('room') || 
+                p.className.toLowerCase().includes('space')
+            );
+            const hasWindow = predictions.some(p => 
+                p.className.toLowerCase().includes('window')
+            );
+
+            return `空间采用${hasOpenSpace ? '开放式' : '功能分区式'}布局，线规划流畅自然。${
+                hasWindow ? '充足的自然采光提升了空间的通透感，' : ''}空间层次分明，功能区域划分合理，
+                既保证了各区域的独立性，又让整体空间保持良好的互动性。`;
+        }
+
+        // 生成设计元素分析
+        function generateElementsAnalysis(predictions) {
+            const elements = predictions.map(p => ({
+                name: p.className,
+                probability: p.probability
+            })).filter(e => e.probability > 0.1);
+
+            // 分类元素
+            const furniture = elements.filter(e => 
+                e.name.toLowerCase().includes('chair') || 
+                e.name.toLowerCase().includes('table') || 
+                e.name.toLowerCase().includes('sofa') ||
+                e.name.toLowerCase().includes('bed')
+            );
+            
+            const lighting = elements.filter(e => 
+                e.name.toLowerCase().includes('lamp') || 
+                e.name.toLowerCase().includes('light')
+            );
+            
+            const decor = elements.filter(e => 
+                e.name.toLowerCase().includes('art') || 
+                e.name.toLowerCase().includes('plant') ||
+                e.name.toLowerCase().includes('vase')
+            );
+
+            return `空间中主要包含了${furniture.length > 0 ? '家具（' + furniture.map(f => f.name).join('、') + '）、' : ''}
+                ${lighting.length > 0 ? '照明（' + lighting.map(l => l.name).join('、') + '）、' : ''}
+                ${decor.length > 0 ? '装饰（' + decor.map(d => d.name).join('、') + '）' : ''}等设计元素。
+                这些元素的组合营造出层次丰富的空间效果，每个元素都经过精心布置，共同构建出和谐统一的设计语言。`;
+        }
+
+        // 生成材质分析
+        function generateMaterialsAnalysis(predictions, colorAnalysis) {
+            const materials = predictions.filter(p => p.probability > 0.15)
+                .map(p => p.className.toLowerCase());
+            
+            let materialTypes = [];
+            if (materials.some(m => m.includes('wood') || m.includes('timber'))) {
+                materialTypes.push('木质');
+            }
+            if (materials.some(m => m.includes('metal') || m.includes('steel'))) {
+                materialTypes.push('金属');
+            }
+            if (materials.some(m => m.includes('fabric') || m.includes('textile'))) {
+                materialTypes.push('布艺');
+            }
+            if (materials.some(m => m.includes('glass'))) {
+                materialTypes.push('玻璃');
+            }
+            if (materials.some(m => m.includes('stone') || m.includes('marble'))) {
+                materialTypes.push('石材');
+            }
+
+            if (materialTypes.length === 0) {
+                materialTypes = ['现代混合材质'];
+            }
+
+            return `空间运用了${materialTypes.join('、')}等材质，材质搭配自然和谐。
+                ${colorAnalysis.warm > colorAnalysis.cool ? '温润的材质质感' : '清爽的材质质感'}
+                为空间增添了独特的触感体验，不同材质之间过渡自然，相互呼���，创造出��富的质感层次。`;
+        }
+
+        // 生成色彩分析
+        function generateColorAnalysis(colorAnalysis) {
+            const total = colorAnalysis.warm + colorAnalysis.cool + colorAnalysis.neutral;
+            const warmPercent = (colorAnalysis.warm / total * 100).toFixed(0);
+            const coolPercent = (colorAnalysis.cool / total * 100).toFixed(0);
+            const brightPercent = (colorAnalysis.bright / total * 100).toFixed(0);
+
+            let colorScheme = '';
+            if (colorAnalysis.warm > colorAnalysis.cool) {
+                colorScheme = `以温暖色为主(约占${warmPercent}%)，营造出温馨舒适的氛围`;
+            } else if (colorAnalysis.cool > colorAnalysis.warm) {
+                colorScheme = `以冷静色调为主(约占${coolPercent}%)，打造清新怡人的空间感`;
+            } else {
+                colorScheme = '采用中性色调为主，呈现出沉稳大气的格调';
+            }
+
+            return `空间色彩方案${colorScheme}。${
+                brightPercent > 60 ? '明亮的色调(约占' + brightPercent + '%)提升了空间的通透感，' : 
+                '深沉的色调营造出静谧的氛围，'
+            }通过主色调与点缀色巧妙配合，形成层次丰富的视觉效果，使空间既统一和谐又富有变化。`;
+        }
+
+        // 修改 handleAIImageUpload 函数
+        async function handleAIImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                showToast('请选择图片');
+                return;
+            }
+
+            const resultDiv = document.getElementById('aiTagResult');
+            resultDiv.innerHTML = '<div class="ai-loading">正在分析图片...</div>';
+            
+            try {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    img.src = e.target.result;
+                    img.onload = async () => {
+                        try {
+                            // 加载模型
+                            const model = await mobilenet.load({
+                                version: 2,
+                                alpha: 1.0
+                            });
+
+                            // 获取预测结果
+                            const predictions = await model.classify(img, 10);
+                            console.log('预测结果:', predictions);
+
+                            // 根据预测结果生成标签建议
+                            const suggestedTags = {
+                                function: analyzeFunctionTags(predictions),
+                                atmosphere: analyzeAtmosphereTags(predictions),
+                                elements: analyzeElementTags(predictions),
+                                story: analyzeStoryTags(predictions)
+                            };
+
+                            // 显示结果
+                            displayResults(resultDiv, img, suggestedTags);
+                            
+                        } catch (error) {
+                            console.error('分析失败:', error);
+                            resultDiv.innerHTML = '<div class="error">分析失败: ' + error.message + '</div>';
+                        }
+                    };
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('文件处理失败:', error);
+                resultDiv.innerHTML = '<div class="error">文件处理失败，请重试</div>';
+            }
+        }
+
+        // 添加新的分析函数
+        function analyzeFunctionTags(predictions) {
+            const functionKeywords = {
+                'room': ['标准客房', '套房'],
+                'dining': ['餐厅', '公共厨房'],
+                'living': ['休息区', '阅读区'],
+                'gym': ['健身区', '瑜伽室'],
+                'outdoor': ['庭院', '露台', '阳台'],
+                'pool': ['泳池'],
+                'workspace': ['Co-working']
+            };
+            
+            const tags = new Set();
+            predictions.forEach(pred => {
+                const label = pred.className.toLowerCase();
+                Object.entries(functionKeywords).forEach(([key, values]) => {
+                    if (label.includes(key) && pred.probability > 0.15) {
+                        values.forEach(tag => tags.add(tag));
+                    }
+                });
+            });
+            
+            return Array.from(tags);
+        }
+        
+        function analyzeAtmosphereTags(predictions) {
+            const atmosphereKeywords = {
+                'nature': ['森系', '田园系'],
+                'water': ['海系'],
+                'mountain': ['山系'],
+                'zen': ['禅意'],
+                'art': ['艺术'],
+                'vintage': ['复古'],
+                'bright': ['晨光', '日光'],
+                'sunset': ['黄昏'],
+                'night': ['夜晚']
+            };
+            
+            const tags = new Set();
+            predictions.forEach(pred => {
+                const label = pred.className.toLowerCase();
+                Object.entries(atmosphereKeywords).forEach(([key, values]) => {
+                    if (label.includes(key) && pred.probability > 0.15) {
+                        values.forEach(tag => tags.add(tag));
+                    }
+                });
+            });
+            
+            return Array.from(tags);
+        }
+        
+        function analyzeElementTags(predictions) {
+            const elementKeywords = {
+                'window': ['落地窗', '天窗'],
+                'arch': ['拱门'],
+                'ceiling': ['吊顶'],
+                'stairs': ['楼梯'],
+                'fireplace': ['壁炉'],
+                'courtyard': ['内天井'],
+                'curtain': ['窗帘'],
+                'carpet': ['地毯'],
+                'cushion': ['抱枕'],
+                'bed': ['床品'],
+                'art': ['艺术品'],
+                'plant': ['绿植'],
+                'lamp': ['灯具'],
+                'furniture': ['家具']
+            };
+            
+            const tags = new Set();
+            predictions.forEach(pred => {
+                const label = pred.className.toLowerCase();
+                Object.entries(elementKeywords).forEach(([key, values]) => {
+                    if (label.includes(key) && pred.probability > 0.15) {
+                        values.forEach(tag => tags.add(tag));
+                    }
+                });
+            });
+            
+            return Array.from(tags);
+        }
+        
+        function analyzeStoryTags(predictions) {
+            const storyKeywords = {
+                'dining': ['早餐时光'],
+                'cafe': ['下午茶'],
+                'camping': ['露营'],
+                'party': ['派对'],
+                'yoga': ['瑜伽冥想'],
+                'work': ['工作'],
+                'reading': ['阅读'],
+                'sea': ['海景第一排'],
+                'mountain': ['山景第一排'],
+                'forest': ['森林环绕'],
+                'city': ['城市天际线']
+            };
+            
+            const tags = new Set();
+            predictions.forEach(pred => {
+                const label = pred.className.toLowerCase();
+                Object.entries(storyKeywords).forEach(([key, values]) => {
+                    if (label.includes(key) && pred.probability > 0.15) {
+                        values.forEach(tag => tags.add(tag));
+                    }
+                });
+            });
+            
+            return Array.from(tags);
+        }
+
+        // 添加关闭AI模态框的函数
+        function closeAIModal() {
+            const modal = document.querySelector('.ai-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // 修改 displayResults 函数
+        function displayResults(resultDiv, img, suggestedTags) {
+            resultDiv.innerHTML = `
+                <div class="tag-preview">
+                    <div class="preview-image" style="margin-bottom: 20px; text-align: center;">
+                        <img src="${img.src}" alt="预览图片" style="max-width: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    </div>
+                    <h4>AI 建议标签（AI建议标签自动选中，可以继续选择其他标签）：</h4>
+                    <div class="tag-categories">
+                        ${Object.entries(tagCategories).map(([category, data]) => `
+                            <div class="tag-category">
+                                <strong>${data.title}：</strong>
+                                <div class="tag-options" data-category="${category}">
+                                    ${Object.values(data.tags).flat().map(tag => `
+                                        <button class="tag-option ${suggestedTags[category].includes(tag) ? 'selected' : ''}">${tag}</button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <textarea class="image-notes" id="aiImageNotes" placeholder="添加备注..."></textarea>
+                    <button class="save-button" onclick="saveAITags()" style="margin-top: 20px; width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">确认标签</button>
+                </div>
+            `;
+
+            // 添加标签点击事件
+            resultDiv.querySelectorAll('.tag-option').forEach(tag => {
+                tag.addEventListener('click', () => {
+                    tag.classList.toggle('selected');
+                });
+            });
+        }
+
+        // 添加多个模型加载
+        async function loadImageModels() {
+            const models = {
+                mobilenet: await mobilenet.load(),
+                efficientnet: await tf.loadGraphModel('path_to_efficientnet'),
+                resnet: await tf.loadGraphModel('path_to_resnet')
+            };
+            return models;
+        }
+
+        // 组合多个模型的预测结果
+        async function combineModelPredictions(img, models) {
+            const predictions = await Promise.all([
+                models.mobilenet.classify(img),
+                models.efficientnet.predict(img),
+                models.resnet.predict(img)
+            ]);
+            
+            return mergePredictions(predictions);
+        }
+
+        // 合并预测结果
+        function mergePredictions(predictions) {
+            // 实现预测结果合并逻辑
+            return predictions[0]; // 临时返值
+        }
+
+        // 添加简单的学习型模型
+        class LearningModel {
+            constructor() {
+                this.patterns = [];
+            }
+
+            // 添加新的学习样本
+            addPattern(features, tags) {
+                this.patterns.push({ features, tags });
+            }
+
+            // 根据特征预测标签
+            predict(features) {
+                if (this.patterns.length === 0) return null;
+
+                // 找到最相似的样本
+                const similarPattern = this.patterns.reduce((best, current) => {
+                    const currentSimilarity = this.calculateSimilarity(features, current.features);
+                    const bestSimilarity = this.calculateSimilarity(features, best.features);
+                    return currentSimilarity > bestSimilarity ? current : best;
+                });
+
+                return similarPattern.tags;
+            }
+
+            // 计算特征相似度
+            calculateSimilarity(features1, features2) {
+                // 实现特征相似度计算
+                return 0.5; // 临时返回值
+            }
+        }
+
+        // 创建学习型模型实例
+        const learningModel = new LearningModel();
+
+        // 在保存标签时更新学习模型
+        function updateLearningModel(imageFeatures, finalTags) {
+            learningModel.addPattern(imageFeatures, finalTags);
+        }
+
+        // 添加 saveAITags 函数
+        async function saveAITags() {
+            const aiImageInput = document.getElementById('aiImageInput');
+            const file = aiImageInput.files[0];
+            
+            if (!file) {
+                showToast('请先上传图片');
+                return;
+            }
+
+            // 获取选中的标签
+            const selectedTags = {};
+            Object.keys(tagCategories).forEach(category => {
+                selectedTags[category] = [];
+            });
+
+            // 获取所有选中的标签
+            document.querySelectorAll('.tag-options').forEach(section => {
+                const category = section.dataset.category;
+                section.querySelectorAll('.tag-option.selected').forEach(tag => {
+                    selectedTags[category].push(tag.textContent);
+                });
+            });
+
+            try {
+                // 保存图片到灵感库
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageData = {
+                        id: Date.now(),
+                        url: e.target.result,
+                        tags: selectedTags,
+                        notes: document.getElementById('aiImageNotes')?.value || ''
+                    };
+
+                    // 保存到数据库
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    store.put(imageData);
+                    
+                    transaction.oncomplete = () => {
+                        // 关闭AI模态框
+                        closeAIModal();
+                        // 刷新图片显示
+                        loadImages();
+                        showToast('图片和标签已保存');
+                    };
+
+                    transaction.onerror = (error) => {
+                        console.error('保存失败:', error);
+                        showToast('保存失败，请重试');
+                    };
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('保存失败:', error);
+                showToast('保存失败，请重试');
+            }
+        }
+
+        // 添加常用标签组合功能
+        function addTagCombination() {
+            const commonCombinations = {
+                '森系客房': ['森系', '标准客房', '原木', '绿植'],
+                '海景餐厅': ['海系', '餐厅', '落地窗', '蓝色系'],
+                '禅意茶室': ['禅意', '茶室', '榻榻米', '木质']
+            };
+            
+            // 实现快速添加标签组合的功能
+        }
+
+        // 基于已有标签的智能推荐
+        function suggestRelatedTags(selectedTags) {
+            const relatedTags = {
+                '森系': ['原木', '绿植', '自然光'],
+                '海系': ['蓝色系', '落地窗', '白色'],
+                '禅意': ['木质', '榻榻米', '简约']
+            };
+            
+            // 实现相关标签推荐逻辑
+        }
+
+        // 添加场景化搜索功能
+        function sceneBasedSearch(scene) {
+            const sceneKeywords = {
+                '早餐时光': ['餐厅', '自然光', '温馨'],
+                '下午茶': ['休息区', '舒适', '情侣'],
+                '夜��派对': ['酒吧', '灯光', '社交']
+            };
+            
+            // 实现场景化搜索逻辑
+        }
+
+        // 在script标签内添加标签数据构
+        const tagCategories = {
+            // 空间功能
+            function: {
+                title: '空间功能',
+                tags: {
+                    public: ['大堂接待', '休息区', '餐厅', '茶室', '酒吧', '公共厨房', '阅读区', '健身区', '瑜伽室', '游戏室', 'Co-working'],
+                    room: ['标准客房', '套房', '家庭房', 'LOFT', '复式房', '主卧', '次卧', '卫生间', '阳台', '露台'],
+                    outdoor: ['庭院', '泳池', '露台', '阳台', '屋顶花园', '户外餐区', '户外休息区', '景观小品']
+                }
+            },
+            // 空间氛围
+            atmosphere: {
+                title: '空间氛围',
+                tags: {
+                    nature: ['森系', '海系', '山系', '田园系'],
+                    culture: ['禅意', '茶意', '艺术', '复古'],
+                    emotion: ['轻松', '静谧', '温馨', '浪漫', '活力'],
+                    time: ['晨光', '日光', '黄昏', '夜晚']
+                }
+            },
+            // 设计元素
+            elements: {
+                title: '设计元素',
+                tags: {
+                    architecture: ['落地窗', '天窗', '拱门', '廊架', '吊顶', '楼梯', '壁炉', '内天井', '架空层'],
+                    softDecoration: ['窗帘', '地毯', '抱枕', '床品', '艺术品', '绿植', '灯具', '家具', '装饰品'],
+                    visualElements: ['对称', '重复', '渐变', '层次', '对比', '韵律', '平衡', '焦点']
+                }
+            },
+            // 场景故事
+            story: {
+                title: '场景故事',
+                tags: {
+                    activity: ['早餐时光', '下午茶', '露营', '派对', '瑜伽冥想', '工作', '阅读'],
+                    nature: ['海景第一排', '山景第一排', '森林环绕', '田园风光', '城市天际线'],
+                    special: ['亲子互动', '情侣约会', '独处空间', '社交空间', '创作空间']
+                }
+            }
+        };
+
+        // 生成标签显示区域
+        function generateTags(category) {
+            const categoryData = tagCategories[category];
+            let html = `<button class="tag" data-category="${category}" data-tag="全部">全部</button>`;
+            
+            Object.values(categoryData.tags).forEach(tagGroup => {
+                tagGroup.forEach(tag => {
+                    html += `<button class="tag" data-category="${category}" data-tag="${tag}">${tag}</button>`;
+                });
+            });
+            
+            return html;
+        }
+
+        // 修改现有的标签区域HTML
+        function updateTagSections() {
+            const container = document.querySelector('.container');
+            const waterfall = document.querySelector('.waterfall-container');
+            
+            const tagTips = {
+                function: '根据空间的使用功能进行分类，帮助您快速找到特定用途的设计参考',
+                atmosphere: '描述空间的整体氛围和风格感受，帮助您找到符合预期情绪的设计灵感',
+                elements: '标记设计中的关键元素和细节，方便您关注特定设计特征',
+                story: '记录空间可能承载的活动场景，帮助您思考空间的实际使用场景'
+            };
+            
+            Object.entries(tagCategories).forEach(([category, data]) => {
+                const section = document.createElement('div');
+                section.className = 'tag-section';
+                section.innerHTML = `
+                    <div class="tag-title-wrapper">
+                        <h3 class="tag-title">${data.title}</h3>
+                        <span class="tag-help" data-tip="${tagTips[category]}">ⓘ</span>
+                    </div>
+                    <div class="tags" data-category="${category}">
+                        ${generateTags(category)}
+                    </div>
+                `;
+                container.insertBefore(section, waterfall);
+            });
+        }
+
+        // 修改标签编辑模态框内容
+        function updateEditModal() {
+            const editContent = document.querySelector('.edit-content .tag-categories');
+            let html = '';
+            
+            Object.entries(tagCategories).forEach(([category, data]) => {
+                html += `
+                    <div class="tag-category">
+                        <h4>${data.title}</h4>
+                        <div class="tag-options" data-category="${category}">
+                            ${Object.values(data.tags).flat().map(tag => 
+                                `<button class="tag-option">${tag}</button>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            editContent.innerHTML = html;
+        }
+
+        // 初始化时调用
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTagSections();
+            updateEditModal();
+            
+            // 初始化数据库
+            const request = indexedDB.open(DB_NAME, 1);
+            
+            request.onerror = (event) => {
+                console.error("数据库错误:", event.target.error);
+                showToast("数据库错误，请检查浏览器设置");
+            };
+
+            request.onupgradeneeded = (event) => {
+                db = event.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                }
+            };
+
+            request.onsuccess = (event) => {
+                db = event.target.result;
+                
+                // 为所有标签添加点击事件
+                document.querySelectorAll('.tag').forEach(tag => {
+                    tag.addEventListener('click', () => {
+                        const category = tag.parentElement.dataset.category;
+                        const isAll = tag.textContent === '全部';
+                        const tags = tag.parentElement.querySelectorAll('.tag');
+                        
+                        if (isAll) {
+                            tags.forEach(t => t.classList.remove('selected'));
+                            tag.classList.toggle('selected');
+                        } else {
+                            tag.parentElement.querySelector('.tag:first-child').classList.remove('selected');
+                            tag.classList.toggle('selected');
+                        }
+                        
+                        filterImages();
+                    });
+                });
+
+                // 加载已有图片
+                loadImages();
+            };
+        });
+
+        // 添加确认删除所有照片的函数
+        function confirmDeleteAll() {
+            if (confirm('确定要删除所有照片吗？此操作不可恢复！')) {
+                deleteAllPhotos();
+            }
+        }
+
+        // 删除所有照片的函数
+        function deleteAllPhotos() {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.clear();
+
+            request.onsuccess = () => {
+                loadImages(); // 刷新显示
+                showToast('所有照片已删除');
+            };
+
+            request.onerror = (error) => {
+                console.error('删除失败:', error);
+                showToast('删除失败，请重试');
+            };
+        }
+
+        // 添加通用的关闭模态框方法
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // 添加ESC键关闭模态框
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal('imageViewModal');
+                closeModal('tagEditModal');
+                closeAIModal();
+            }
+        });
+
+        // 添加标签详细说明
+        const tagDescriptions = {
+            // 空间功能标签说明
+            function: {
+                '大堂接待': '酒店或商业空间的主要入口区域，体现接待和服务功能',
+                '休息区': '供人休憩放松的开放式空间，通常配备舒适的座椅',
+                '餐厅': '提供用餐服务的区域，包括就餐空间和服务空间',
+                '茶室': '专门用于品茶、冥想的静谧空间，强调东方美学',
+                '酒吧': '以酒水服务为主的社交空间，注重氛围营造',
+                '公共厨房': '共享式厨房空间，适合社交互动和烹饪体验',
+                '阅读区': '安静的阅读和学习空间，注重照明和舒适度',
+                '健���区': '运动健身场所，需要合理的空间布局和设备配置',
+                '瑜伽室': '用于瑜伽、冥想的专属空间，强调宁静和放松',
+                '游戏室': '娱乐互动空间，适合社交活动和休闲娱乐',
+                'Co-working': '共享办公空间，兼具办公和社交功能',
+                '标准客房': '酒店基础住宿单元，提供舒适的休息空间',
+                '套房': '带有独立起居室的豪华住宿空间',
+                '家庭房': '适合家庭入住的大型房间，配备完善设施',
+                'LOFT': '挑高空间设计，具有现代艺术感',
+                '复式房': '双层结构住宿空间，空间利用更灵活',
+                '主卧': '住宅中的主要睡眠空间，注重私密性和舒适度',
+                '次卧': '次要卧室空间，可灵活改造使用',
+                '卫生间': '盥洗空间，注重功能性和卫生条件',
+                '阳台': '室内外过渡空间，提供自然采光和休闲区域',
+                '露台': '开放式室外活动空间，可用于休闲娱乐',
+                '庭院': '私密的户外绿化空间，提供自然环境体验',
+                '泳池': '供游泳运动和休闲的水景设施',
+                '屋顶花园': '楼顶绿化空间，提供休闲和观景功能',
+                '户外餐区': '室外用餐空间，结合自然环境',
+                '户外休息区': '户外放松休憩的开放空间',
+                '景观小品': '装饰性景观元素，提升环境美感',
+                '健身区': '运动健身场所，需要合理的空间布局和设备配置'
+            },
+            // 空间氛围标签说明
+            atmosphere: {
+                '森系': '以自然元素为主，营造清新自然的氛围',
+                '海系': '运用蓝色调和海洋元素，打造清爽舒适的空间感',
+                '山系': '融入山景元素，体现自然与人文的和谐',
+                '田园系': '结合乡村风情，营造温馨自然的氛围',
+                '禅意': '简约淡雅，体现东方禅学美学',
+                '茶意': '融入茶文化元素，营造雅致恬静的氛围',
+                '艺术': '融入艺术作品，彰显文化品味',
+                '复古': '运用怀旧元素，重现特定年代风格',
+                '轻松': '舒适惬意的氛围，减少压力感的空间设计',
+                '静谧': '安静祥和的氛围，适合放松和沉思',
+                '温馨': '给人温暖舒适感的空间氛围，像家一样舒适',
+                '浪漫': '营造温情浪漫的氛围，适合情侣或特殊场合',
+                '活力': '充满朝气和活力的空间氛围，让人精神焕发',
+                '晨光': '清晨阳光营造的明亮温暖氛围',
+                '日光': '充足自然光照射下的明快空间氛围',
+                '黄昏': '日落时分温暖柔和的光线氛围',
+                '夜晚': '夜间灯光营造的温馨静谧氛围'
+            },
+            // 设计元素标签说明
+            elements: {
+                '落地窗': '大面积玻璃窗，提供自然采光和景观视野',
+                '天窗': '屋顶采光窗，引入自然光线和空间变化',
+                '拱门': '弧形门洞设计，增添空间层次和艺术感',
+                '廊架': '架空结构，用于空间分隔或景观营造',
+                '吊顶': '天花板造型设计，强调空间主题',
+                '楼梯': '垂直交通空间，兼具实用性和装饰性',
+                '壁炉': '供取暖或装饰用的火炉设计',
+                '内天井': '室内庭院空间，提供采光和自然景观',
+                '窗帘': '用于控制光线和隐私的窗帘',
+                '地毯': '装饰性地毯，增添空间温馨感',
+                '抱枕': '装饰性抱枕，提供舒适的休憩感',
+                '床品': '装饰性床品，增添空间舒适度',
+                '艺术品': '装饰性艺术品，彰显文化品味',
+                '绿植': '室内绿植，提供自然环境和空气净化',
+                '家具': '装饰性家具，增添空间实用性和美观',
+                '装饰品': '装饰性装饰品，增添空间艺术感',
+                '对称': '对称布局，增添空间美观和平衡感',
+                '重复': '重复元素，增添空间节奏感',
+                '渐变': '渐变色彩，增添空间层次感',
+                '层次': '层次布局，增添空间深度感',
+                '对比': '对比色彩，增添空间视觉冲击力',
+                '韵律': '韵律布局，增添空间节奏感',
+                '平衡': '平衡布局，增添空间和谐感',
+                '焦点': '焦点元素，吸引视线和注意力',
+                '架空层': '建筑中的架空设计，提供通风和空间延展',
+                '灯具': '照明设备的艺术设计，既实用又装饰'
+            },
+            // 场景故事标签说明
+            story: {
+                '早餐时光': '清晨用餐场景，强调明亮温馨的氛围',
+                '下午茶': '休闲社交场景，注重舒适和优雅',
+                '露营': '户外露营体验空间，融合自然元素',
+                '派对': '社交聚会场景，强调互动和氛围',
+                '瑜伽冥想': '静心修习场景，注重空间的宁静感',
+                '工作': '办公场景，平衡效率与舒适度',
+                '阅读': '安静阅读场景，营造专注的氛围',
+                '海景第一排': '直面海景的优质观景位置，尽享海天一色',
+                '山景第一排': '面向山景的绝佳位置，欣赏自然美景',
+                '森林环绕': '被绿色植被环抱的空间，享受自然氛围',
+                '田园风光': '充满乡村田园气息的景观环境',
+                '城市天际线': '可观赏城市天际线的优越位置',
+                '亲子互动': '适合父母与孩子互动的温馨场景',
+                '情侣约会': '适合情侣共处的浪漫场景设计',
+                '独处空间': '适合一个人安静放松的私密空间',
+                '社交空间': '适合人们交流互动的开放式空间',
+                '创作空间': '激发创意灵感的专业工作空间'
+            }
+        };
+
+        /* 添加提示框显示逻辑 */
+        function showTooltip(event, text) {
+            if (!text) return; // 如果没有描述文本，不显示提示框
+            let tooltip = document.querySelector('.tooltip-container');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.className = 'tooltip-container';
+                document.body.appendChild(tooltip);
+            }
+
+            tooltip.textContent = text;
+            tooltip.style.display = 'block';
+
+            const rect = event.target.getBoundingClientRect();
+            const tooltipHeight = tooltip.offsetHeight;
+
+            // 计算视口边界
+            const viewportHeight = window.innerHeight;
+            const viewportWidth = window.innerWidth;
+
+            // 计算基础位置
+            let left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2);
+            let top = rect.top - tooltipHeight - 10;
+
+            // 确保提示框不会超出视口边界
+            if (top < 0) {
+                // 如果上方空间不够，显示在下方
+                top = rect.bottom + 10;
+            }
+            if (left < 0) {
+                left = 0;
+            } else if (left + tooltip.offsetWidth > viewportWidth) {
+                left = viewportWidth - tooltip.offsetWidth;
+            }
+
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+
+        /* 添加提示框隐藏逻辑 */
+        document.addEventListener('mouseover', function(event) {
+            const tag = event.target;
+            if (tag.classList.contains('tag')) {
+                const category = tag.dataset.category;
+                const tagText = tag.dataset.tag;
+                
+                let tooltipText = '';
+                if (tagText === '全部') {
+                    tooltipText = `显示所有${tagCategories[category].title}`;
+                } else {
+                    tooltipText = tagDescriptions[category]?.[tagText];
+                }
+                
+                if (tooltipText) {
+                    showTooltip(event, tooltipText);
+                }
+            }
+        });
+
+        document.addEventListener('mouseout', function(event) {
+            if (event.target.classList.contains('tag')) {
+                const tooltip = document.querySelector('.tooltip-container');
+                if (tooltip) {
+                    tooltip.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+    
